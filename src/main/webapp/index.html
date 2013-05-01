@@ -71,13 +71,14 @@
 		results.empty();
 		results.append($(document.createElement("h3")).text(data.length + " Results"));
 		for(var i = 0; i < data.length; i++) {
-			results.append(buildSearchResult(data[i]));
+			var div = buildSearchResult(data[i]);
+			div.css("background-color", "whitesmoke");
+			results.append(div);
 		}
 	}
 	
 	function buildSearchResult(entry) {
 		div = $(document.createElement("div"));
-		div.append($(document.createElement("hr")));
 		div.append($(document.createElement("h3")).html('<a target="_blank" href="http://www.ludumdare.com/compo/ludum-dare-26/?action=preview&uid=' + entry.uid + '">' + entry.title + "</a>"));
 		div.append($(document.createElement("h5")).text(entry.user));
 		var links = $(document.createElement("h4"));
@@ -93,6 +94,7 @@
 		if(entry.screenshotUrls && entry.screenshotUrls.length > 0) {
 			var img = $(document.createElement("img"));
 			img.attr("src", entry.screenshotUrls[0]);
+			img.css("max-width", "480px");
 			div.append(document.createElement("br"));
 			div.append(img);
 		}
