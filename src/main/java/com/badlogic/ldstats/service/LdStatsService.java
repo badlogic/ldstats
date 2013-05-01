@@ -45,13 +45,13 @@ public class LdStatsService {
 				log.info("Couldn't read bootstrap file");
 			}
 		}
-//		TimerTask task = new TimerTask() {
-//			@Override
-//			public void run() {
-//				crawl();
-//			}
-//		};
-//		new Timer().scheduleAtFixedRate(task, 0, 1000 * 3600 * 24);
+		TimerTask task = new TimerTask() {
+			@Override
+			public void run() {
+				crawl();
+			}
+		};
+		new Timer().scheduleAtFixedRate(task, 0, 1000 * 3600 * 24);
 	}
 	
 	@GET
@@ -140,9 +140,9 @@ public class LdStatsService {
 							   @QueryParam("quser") String userQuery, 
 							   @QueryParam("qtext") String textQuery,
 							   @QueryParam("mincomments") int minComments) {
-		String[] linkKeywords = linkQuery != null & linkQuery.length() != 0? linkQuery.split(","): new String[0];
-		String[] userKeywords = userQuery != null & userQuery.length() != 0? userQuery.split(","): new String[0];
-		String[] textKeywords = textQuery != null & textQuery.length() != 0? textQuery.split(","): new String[0];
+		String[] linkKeywords = linkQuery != null && linkQuery.length() != 0? linkQuery.split(","): new String[0];
+		String[] userKeywords = userQuery != null && userQuery.length() != 0? userQuery.split(","): new String[0];
+		String[] textKeywords = textQuery != null && textQuery.length() != 0? textQuery.split(","): new String[0];
 		
 		List<LdEntry> results = new ArrayList<LdEntry>();
 		synchronized (entries) {

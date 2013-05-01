@@ -78,9 +78,9 @@
 	function buildSearchResult(entry) {
 		div = $(document.createElement("div"));
 		div.append($(document.createElement("hr")));
-		div.append($(document.createElement("h2")).html('<a target="_blank" href="http://www.ludumdare.com/compo/ludum-dare-26/?action=preview&uid=' + entry.uid + '">' + entry.title + "</a>"));
-		div.append($(document.createElement("h4")).text(entry.user));
-		var links = $(document.createElement("h3"));
+		div.append($(document.createElement("h3")).html('<a target="_blank" href="http://www.ludumdare.com/compo/ludum-dare-26/?action=preview&uid=' + entry.uid + '">' + entry.title + "</a>"));
+		div.append($(document.createElement("h5")).text(entry.user));
+		var links = $(document.createElement("h4"));
 		for(var key in entry.links) {
 			var link = $(document.createElement("a"));
 			link.text(key);
@@ -90,7 +90,7 @@
 			links.append(" | ");
 		}
 		div.append(links);
-		if(entry.screenshotUrls && entry.screenshotUrls.length > 1) {
+		if(entry.screenshotUrls && entry.screenshotUrls.length > 0) {
 			var img = $(document.createElement("img"));
 			img.attr("src", entry.screenshotUrls[0]);
 			div.append(document.createElement("br"));
