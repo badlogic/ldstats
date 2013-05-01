@@ -45,19 +45,20 @@ public class LdStatsService {
 				log.info("Couldn't read bootstrap file");
 			}
 		}
-		TimerTask task = new TimerTask() {
-			@Override
-			public void run() {
-				crawl();
-			}
-		};
-		new Timer().scheduleAtFixedRate(task, 0, 1000 * 3600 * 24);
+//		TimerTask task = new TimerTask() {
+//			@Override
+//			public void run() {
+//				crawl();
+//			}
+//		};
+//		new Timer().scheduleAtFixedRate(task, 0, 1000 * 3600 * 24);
 	}
 	
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("crawl")
-	public void crawl() {
-		if(crawling) return;
+	public boolean crawl() {
+		if(crawling) return true;
 		crawling = true;
 		new Thread(new Runnable() {
 			public void run() {
@@ -73,6 +74,7 @@ public class LdStatsService {
 				}
 			}
 		}).start();
+		return true;
 	}
 	
 	@GET
@@ -138,14 +140,14 @@ public class LdStatsService {
 							   @QueryParam("quser") String userQuery, 
 							   @QueryParam("qtext") String textQuery,
 							   @QueryParam("mincomments") int minComments) {
-		String[] linkKeywords = linkQuery != null? linkQuery.split(","): new String[0];
-		String[] userKeywords = userQuery != null? userQuery.split(","): new String[0];
-		String[] textKeywords = textQuery != null? textQuery.split(","): new String[0];
+		String[] linkKeywords = linkQuery != null & linkQuery.length() != 0? linkQuery.split(","): new String[0];
+		String[] userKeywords = userQuery != null & userQuery.length() != 0? userQuery.split(","): new String[0];
+		String[] textKeywords = textQuery != null & textQuery.length() != 0? textQuery.split(","): new String[0];
 		
 		List<LdEntry> results = new ArrayList<LdEntry>();
 		synchronized (entries) {
 			for(LdEntry entry: entries) {
-				if(match(linkKeywords, entry.links.values()) &&
+				if(match(linkKeywords, entry.links.keySet()) &&
 				   match(userKeywords, entry.user) &&
 				   match(textKeywords, entry.text)){
 					   results.add(entry);
@@ -178,6 +180,7 @@ public class LdStatsService {
 		if(keywords.length == 0) return true;
 		String lowerText = text.toLowerCase();
 		for(String keyword: keywords) {
+			if(keyword.length() == 0) continue;
 			if(lowerText.contains(keyword.toLowerCase())) return true;
 		}
 		return false;

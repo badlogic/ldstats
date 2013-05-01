@@ -1,1 +1,105 @@
-<h2>LD Statistics</h2>
+<html>
+<head>
+<title>Ludum Dare Search</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Bootstrap -->
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bootstrap-responsive.css" rel="stylesheet">
+</head>
+<body>
+	<script src="http://code.jquery.com/jquery.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/bootstrap-button.js"></script>
+
+	<div class="navbar navbar-inverse">
+		<div class="navbar-inner">
+			<a class="brand" href="#">LD48 Search</a>
+			<ul class="nav">
+				<li><a href="http://github.com/badlogic/ldstats">Source</a></li>
+				<li><a href="http://github.com/badlogic/ldstats">API</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="container">
+		<h1>Ludum Dare Search</h1>
+		<p>
+			This site allows you to search Ludum Dare entries. That way you can
+			for example just display web based games by filtering the link type.<br />
+			<br /> Specify query terms for link types (e.g. web, desktop),
+			users, and keywords in the entry descriptions. Separate terms by
+			comma.
+		</p>
+		<form>
+			<fieldset>
+				<div class="control-group">
+				<label>Keywords</label> 
+				<input id="keywords" type="text" value="gdx", placeholder="gdx,...">
+				<label>Platforms</label> 
+				<input id="platforms" type="text" placeholder="web,desktop..."> 
+				<label>Users</label> 
+				<input id="users" type="text" placeholder="badlogic,..."> 
+				<button id="search" type="submit" class="btn">Search</button>
+				</div>
+			</fieldset>
+		</form>
+		<div id="results">
+		</div>
+	</div>
+
+	<script>
+	$(document).ready(function() { 
+        $("form").submit(function() {
+    		var results = $("#results");
+    		results.empty();
+    		results.text("Searching...");
+        	$.ajax({ "url": "rest/query", 
+        			 "data": { 
+        				 "qtext": $("#keywords").val(), 
+        				 "quser": $("#users").val(), 
+        				 "qlink": $("#platforms").val()
+        			  }, 
+        			  "success": function(data) { buildResults(data);}
+        	});
+        	return false;
+        });
+    });
+	
+	function buildResults(data) {
+		var results = $("#results");
+		results.empty();
+		results.append($(document.createElement("h3")).text(data.length + " Results"));
+		for(var i = 0; i < data.length; i++) {
+			results.append(buildSearchResult(data[i]));
+		}
+	}
+	
+	function buildSearchResult(entry) {
+		div = $(document.createElement("div"));
+		div.append($(document.createElement("hr")));
+		div.append($(document.createElement("h2")).html('<a target="_blank" href="http://www.ludumdare.com/compo/ludum-dare-26/?action=preview&uid=' + entry.uid + '">' + entry.title + "</a>"));
+		div.append($(document.createElement("h4")).text(entry.user));
+		var links = $(document.createElement("h3"));
+		for(var key in entry.links) {
+			var link = $(document.createElement("a"));
+			link.text(key);
+			link.attr("href", entry.links[key]);
+			link.attr("target", "_blank");
+			links.append(link);
+			links.append(" | ");
+		}
+		div.append(links);
+		if(entry.screenshotUrls && entry.screenshotUrls.length > 1) {
+			var img = $(document.createElement("img"));
+			img.attr("src", entry.screenshotUrls[0]);
+			div.append(document.createElement("br"));
+			div.append(img);
+		}
+		div.append($(document.createElement("p")).text(entry.text));
+		div.append($(document.createElement("div")).html('<a target="_blank" href="http://www.ludumdare.com/compo/ludum-dare-26/?action=preview&uid=' + entry.uid + '">' + entry.comments.length + " Comments</a>"));
+		return div;
+	}
+	</script>
+</body>
+</html>
