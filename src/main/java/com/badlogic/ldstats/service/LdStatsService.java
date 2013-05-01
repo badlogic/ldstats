@@ -149,7 +149,8 @@ public class LdStatsService {
 			for(LdEntry entry: entries) {
 				if(match(linkKeywords, entry.links.keySet()) &&
 				   match(userKeywords, entry.user) &&
-				   match(textKeywords, entry.text)){
+				   match(textKeywords, entry.text) &&
+				   match(textKeywords, entry.title)){
 					   results.add(entry);
 				   }
 			}
