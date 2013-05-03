@@ -42,10 +42,10 @@ public class LdStatsService {
 	LdStatsServiceConfig config;
 
 	public LdStatsService() {
-		config = new LdStatsServiceConfig();
-		config.datasetUrl = "file:///Users/badlogic/workspace/ldstats/data/ludum-dares.zip";
-		config.ldsToCrawl = new String[0];
-//		config = readConfig();
+//		config = new LdStatsServiceConfig();
+//		config.datasetUrl = "file:///Users/badlogic/workspace/ldstats/data/ludum-dares.zip";
+//		config.ldsToCrawl = new String[0];
+		config = readConfig();
 		loadDataset(config);
 		TimerTask task = new TimerTask() {
 			@Override
@@ -53,7 +53,7 @@ public class LdStatsService {
 				crawl();
 			}
 		};
-//		new Timer().scheduleAtFixedRate(task, 0, 1000 * 3600 * 24);
+		new Timer().scheduleAtFixedRate(task, 0, 1000 * 3600 * 24);
 	}
 	
 	public static class LdStatsServiceConfig {
