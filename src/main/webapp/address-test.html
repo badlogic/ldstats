@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>TheTutorialBlog.com : jQuery Deep Linking</title>
+<script src="http://www.google.com/jsapi"></script>
+<script type="text/javascript">
+	google.load("jquery", "1.4.1");
+</script>
+<script src="js/jquery.address.min.js"></script>
+<script src="js/jquery.deserialize.min.js"></script>
+<body>
+	<form>
+			<label>Keywords</label>
+			<input name="qtext" type="text" placeholder="gdx,...">
+			<label>Platforms</label> 
+			<input name="qlink" type="text" placeholder="web,desktop...">
+			<button type="submit" class="btn">Search</button>
+	</form>
+</body>
+<script type="text/javascript">
+	$("document").ready(function() {
+		$("form").submit(search);
+		$.address.init(function(event) {
+			console.log("init: " + event.path);
+		}).change(function(event) {
+			if(event.path != '/') {
+				$("form").deserialize(event.path.substring(1));
+				console.log("change: " + event.path);
+			}
+		})
+	});
+	
+	function search() {
+		$.address.value($("form").serialize());
+		return false;
+	}
+</script>
+</head>

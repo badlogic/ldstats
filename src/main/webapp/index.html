@@ -1,9 +1,7 @@
 <html>
 <head>
 <title>Ludum Dare Search</title>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- Bootstrap -->
 <link href="css/bootstrap.min.css" rel="stylesheet">
 <link href="css/bootstrap-responsive.css" rel="stylesheet">
 </head>
@@ -11,6 +9,8 @@
 	<script src="http://code.jquery.com/jquery.js"></script>
 	<script src="js/bootstrap.min.js"></script>
 	<script src="js/bootstrap-button.js"></script>
+	<script src="js/jquery.address.js"></script>
+	<script src="js/jquery.deserialize.min.js"></script>
 
 	<div class="navbar navbar-inverse">
 		<div class="navbar-inner">
@@ -34,13 +34,30 @@
 		<form>
 			<fieldset>
 				<div class="control-group">
+				<label>Ludum Dare #</label>
+				<select name="qld">
+				</select>
 				<label>Keywords</label> 
-				<input id="keywords" type="text" placeholder="gdx,...">
+				<input name="qtext" type="text" placeholder="gdx,...">
 				<label>Platforms</label> 
-				<input id="platforms" type="text" placeholder="web,desktop..."> 
+				<input name="qlink" type="text" placeholder="web,desktop..."> 
 				<label>Users</label> 
-				<input id="users" type="text" placeholder="badlogic,..."> 
+				<input name="quser" type="text" placeholder="badlogic,..."><br/>
+				<label>Type</label>
+				<select name="qtype">
+				  <option value="">All</option>
+				  <option value="compo">48h Compo Entries</option>
+				  <option value="open">Jam Entries</option>
+				</select><br/>
+				<label>Sort By</label>
+				<select name="qsort">
+				  <option value="">None</option>
+				  <option value="comment">Comment Count</option>
+				  <option value="title">Title</option>
+				</select><br/>
 				<button id="search" type="submit" class="btn">Search</button>
+				<input name="qstart" type="hidden" value="0">
+				<input name="qlength" type="hidden" value="24"> 
 				</div>
 			</fieldset>
 		</form>
@@ -49,29 +66,50 @@
 	</div>
 
 	<script>
-	$(document).ready(function() { 
-        $("form").submit(function() {
-    		var results = $("#results");
-    		results.empty();
-    		results.text("Searching...");
-        	$.ajax({ "url": "rest/query", 
-        			 "data": { 
-        				 "qtext": $("#keywords").val(), 
-        				 "quser": $("#users").val(), 
-        				 "qlink": $("#platforms").val()
-        			  }, 
-        			  "success": function(data) { buildResults(data);}
+	$(document).ready(function() {
+		$.ajax({ "url": "rest/ludumDares", "success": function(data) {
+			var ld = $('[name="qld"]');
+			for(var i = 0; i < data.length; i++) {
+				ld.append($(document.createElement("option")).val(data[i]).text("LD" + data[i]));
+			}
+			console.log("received lds");
+			console.log(data);
+        	$("form").submit(function() {
+        		$.address.value($("form").serialize());
+        		return false;
         	});
-        	return false;
-        });
+		}})
+		$.address.init(function(event) {
+				console.log("init: " + event.path);
+			}).change(function(event) {
+				console.log("changed url: " + event.path);
+				if(event.path != '/') {
+					$("form").deserialize(event.path.substring(1), search);
+				} else {
+					$("form")[0].reset();
+				}
+			})
     });
+	
+	function search() {
+		var results = $("#results");
+		results.empty();
+		results.text("Searching...");
+    	$.ajax({ "url": "rest/query", 
+			 "data": $("form").serialize(), 
+			  "success": function(data) { 
+				$("#results").empty();
+				buildResults(data);
+			  }
+		});
+    }
 	
 	function buildResults(data) {
 		var results = $("#results");
-		results.empty();
-		results.append($(document.createElement("h3")).text(data.length + " Results"));
-		for(var i = 0; i < data.length; i++) {
-			var div = buildSearchResult(data[i]);
+		results.append($(document.createElement("h3")).text(data.total + " Results"));
+		var entries = data.entries;
+		for(var i = 0; i < entries.length; i++) {
+			var div = buildSearchResult(entries[i]);
 			div.css("background-color", "whitesmoke");
 			results.append(div);
 		}
@@ -79,7 +117,7 @@
 	
 	function buildSearchResult(entry) {
 		div = $(document.createElement("div"));
-		div.append($(document.createElement("h3")).html('<a target="_blank" href="http://www.ludumdare.com/compo/ludum-dare-26/?action=preview&uid=' + entry.uid + '">' + entry.title + "</a>"));
+		div.append($(document.createElement("h3")).html('<a target="_blank" href="http://www.ludumdare.com/compo/ludum-dare-' + $("#ld").val() + '/?action=preview&uid=' + entry.uid + '">' + entry.title + "</a>"));
 		div.append($(document.createElement("h5")).text(entry.user));
 		var links = $(document.createElement("h4"));
 		for(var key in entry.links) {
@@ -98,8 +136,8 @@
 			div.append(document.createElement("br"));
 			div.append(img);
 		}
-		div.append($(document.createElement("p")).text(entry.text));
-		div.append($(document.createElement("div")).html('<a target="_blank" href="http://www.ludumdare.com/compo/ludum-dare-26/?action=preview&uid=' + entry.uid + '">' + entry.comments.length + " Comments</a>"));
+		div.append($(document.createElement("p")).html(entry.text));
+		div.append($(document.createElement("div")).html('<a target="_blank" href="http://www.ludumdare.com/compo/ludum-dare-' + $("#ld").val() + '/?action=preview&uid=' + entry.uid + '">' + entry.comments.length + " Comments</a>"));
 		return div;
 	}
 	</script>
